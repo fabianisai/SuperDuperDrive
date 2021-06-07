@@ -188,8 +188,8 @@ class CloudStorageApplicationTests {
 		Assertions.assertEquals(CRED_URL, savedCred.getText());
 		Thread.sleep(1000);
 
-		WebElement editNote = driver.findElement(By.cssSelector("button.edit-credential"));
-		editNote.click();
+		WebElement editCred = driver.findElement(By.cssSelector("button.edit-credential"));
+		editCred.click();
 		Thread.sleep(1000);
 
 		WebElement credentialUrl1 = driver.findElement(By.id("credential-url"));
@@ -203,8 +203,8 @@ class CloudStorageApplicationTests {
 		homeReturn1.click();
 		Thread.sleep(1000);
 
-		WebElement notesTab2 = driver.findElement(By.id("nav-credentials-tab"));
-		notesTab2.click();
+		WebElement credTab2 = driver.findElement(By.id("nav-credentials-tab"));
+		credTab2.click();
 		Thread.sleep(1000);
 
 		WebElement savedCredential = driver.findElement(By.cssSelector("th.check-credential-url"));

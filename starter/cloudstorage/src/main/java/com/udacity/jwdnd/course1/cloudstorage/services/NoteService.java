@@ -2,8 +2,13 @@ package com.udacity.jwdnd.course1.cloudstorage.services;
 
 import com.udacity.jwdnd.course1.cloudstorage.mapper.NoteMapper;
 import com.udacity.jwdnd.course1.cloudstorage.mapper.UserMapper;
+import com.udacity.jwdnd.course1.cloudstorage.model.FormCredential;
+import com.udacity.jwdnd.course1.cloudstorage.model.FormNote;
 import com.udacity.jwdnd.course1.cloudstorage.model.Note;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class NoteService {
@@ -15,25 +20,40 @@ public class NoteService {
         this.noteMapper = noteMapper;
     }
 
-    public void addNote(String title, String description, String userName) {
-        Integer userId = userMapper.getUser(userName).getUserId();
+
+    public void handlerSave(FormNote note, Authentication authentication){
+
+        String noteIdStr = note.getNoteId();
+
+        if (noteIdStr.isEmpty()) {
+            Integer userId = userMapper.getByUsername(authentication.getName()).getUserId();
+            add(note.getTitle(), note.getDescription(), userId);
+        } else {
+            Note noteTemp = getById(Integer.parseInt(noteIdStr));
+            update(noteTemp.getNoteId(), note.getTitle(), note.getDescription());
+        }
+    }
+
+    private void add(String title, String description, Integer userId) {
+
         Note note = new Note(0, title, description, userId);
-        noteMapper.insert(note);
+        noteMapper.add(note);
     }
 
-    public Note[] getNotesByUser(Integer userId) {
-        return noteMapper.getNotesByUser(userId);
+    private void update(Integer noteId, String title, String description) {
+        noteMapper.update(noteId, title, description);
     }
 
-    public Note getNote(Integer noteId) {
-        return noteMapper.getNote(noteId);
+    public void delete(Integer noteId) {
+        noteMapper.delete(noteId);
     }
 
-    public void deleteNote(Integer noteId) {
-        noteMapper.deleteNote(noteId);
+    public Note getById(Integer noteId) {
+        return noteMapper.getById(noteId);
     }
 
-    public void updateNote(Integer noteId, String title, String description) {
-        noteMapper.updateNote(noteId, title, description);
+    public List<Note> getByUser(Integer userId) {
+        return noteMapper.getByUser(userId);
     }
+
 }

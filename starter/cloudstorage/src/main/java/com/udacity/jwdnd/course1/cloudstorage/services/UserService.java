@@ -11,26 +11,45 @@ import java.util.Base64;
 public class UserService {
     private final UserMapper userMapper;
     private final HashService hashService;
+    private final EncryptionService encryptionService;
 
-    public UserService(UserMapper userMapper, HashService hashService) {
+    public UserService(UserMapper userMapper, HashService hashService, EncryptionService encryptionService) {
         this.userMapper = userMapper;
         this.hashService = hashService;
+        this.encryptionService = encryptionService;
     }
 
-    public boolean isUsernameAvailable(String username) {
-        return userMapper.getUser(username) == null;
+    public int create(User user) {
+        String encodeKey=encodeKey();
+        String hashedPassword = hashService.getHashedValue(user.getPassword(), encodeKey);
+        return userMapper.add(new User(null, user.getUsername(), encodeKey, hashedPassword, user.getFirstName(), user.getLastName()));
     }
 
-    public int createUser(User user) {
+    public boolean exists(String username) {
+        return userMapper.getByUsername(username) == null;
+    }
+
+
+
+    public User getByUsername(String username) {
+        return userMapper.getByUsername(username);
+    }
+
+    public String encodeKey(){
         SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        String encodedSalt = Base64.getEncoder().encodeToString(salt);
-        String hashedPassword = hashService.getHashedValue(user.getPassword(), encodedSalt);
-        return userMapper.insert(new User(null, user.getUsername(), encodedSalt, hashedPassword, user.getFirstName(), user.getLastName()));
+        byte[] key = new byte[16];
+        random.nextBytes(key);
+        String encodedKey = Base64.getEncoder().encodeToString(key);
+        return encodedKey;
     }
 
-    public User getUser(String username) {
-        return userMapper.getUser(username);
+    public String encryptedPassword(String password,String encodeKey){
+
+        SecureRandom random = new SecureRandom();
+        byte[] key = new byte[16];
+        random.nextBytes(key);
+        String encrypPass = encryptionService.encryptValue(password, encodeKey);
+
+        return encrypPass;
     }
 }

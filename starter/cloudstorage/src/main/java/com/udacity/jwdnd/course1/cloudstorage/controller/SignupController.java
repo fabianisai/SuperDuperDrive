@@ -28,8 +28,8 @@ public class SignupController {
     public String signupUser(@ModelAttribute User user, Model model) {
         String error = null;
 
-        if (userService.isUsernameAvailable(user.getUsername())) {
-            int result = userService.createUser(user);
+        if (userService.exists(user.getUsername())) {
+            int result = userService.create(user);
             if (result < 0) {
                 error = "There was an error. Please try again.";
             }
